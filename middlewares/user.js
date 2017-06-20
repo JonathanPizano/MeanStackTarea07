@@ -5,36 +5,6 @@ var User = require('../models/user');
 var jwt = require('../services/jwt');
 var mongoose = require('mongoose');
 
-/*var secret = config.secret
-
-//Comprobamos si vienen los headers
-exports.ensureAuth = function ensureAuth(req, res, next){
-
-    if(!req.headers.authorization){
-        return res.status(403).send({
-            message: 'Invalid request, empty authorization header'
-        })
-    }
-    // Limpiamos los espacios
-    var token = req.headers.authorization.replace(/['"]+/g, '')
-    try{
-        //Desciframos el token
-        var payload = jwt.decode(token, secret)
-        //Verificamos expiracion
-        if(payload.exp <= moment.unix()){
-            return res.status(401).send({message:'expired token'})
-        }
-    }catch(ex){
-        console.log(ex)
-        // Si no es un token valido tiramos un mensaje y status 401
-        return res.status(401).send({message:'Not Authorized, invalid token'})
-    }
-    //Si todo sale bien se guarda el payload en el objeto user del request
-    req.user = payload;
-    next();
-};*/
-
-
 exports.userValidation = function userValidation(req,res,next){
     // Verificar un body vacio
     if(Object.keys(req.body).length === 0){
@@ -73,9 +43,25 @@ exports.userIdParamsValidation = function(req,res,next){
 exports.findUserById = function(req,res,next){
     req.userObj = {};
     //Buscamos usuario por _id
-    req.userObj = User.findOne({_id:req.params.userId}).exec();
-    next()
+    User.find({_id:req.params.userId}).exec()
+    .then((desired)=>{
+            req.userObj = desired
+            next()
+    })
 }
 
+exports.findAll = function(req,res,next){
+    req.userObj = {};
+    //Buscamos a todos los usuarios de la bd 
+    User.find({}).exec()
+    .then((usuarios)=>{
+            req.userObj = usuarios
+            console.log(req.userObj)
+            next()
+    }).catch(function(err){
+        // Reminder: Revisar si realmente atrapa errores
+        res.status(500).send({message:"Error interno del servidor", err:err})
+    })
+}
 
 

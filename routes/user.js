@@ -21,6 +21,17 @@ api.delete('/user/delete/:userId?',
                 md_auth.ensureAuth,
                 md_user.userIdParamsValidation,
                 md_user.findUserById,
-                UserController.deleteUser);                
+                UserController.deleteUser);
+
+api.get('/user/:userId?',
+                md_auth.ensureAuth,
+                md_user.userIdParamsValidation,
+                md_user.findUserById,
+                UserController.showUser);
+
+api.get('/users',
+                md_auth.ensureAuth,
+                md_user.findAll,
+                UserController.showAll);                        
 
 module.exports = api;
