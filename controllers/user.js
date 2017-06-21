@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 var bcrypt = require('bcrypt-nodejs');
 var User = require('../models/user');
@@ -128,14 +128,100 @@ function showAll(req, res){
     } else {
         // Mostrar solo nombres
         var nombres = []
-        /*req.userObj.forEach((usuario)=>{
-            nombres = usuario.username
-       })*/
-       for(var i = 0; i < req.userObj.length; i++){
+        req.userObj.forEach((usuario)=>{
+            var nombre = usuario.username
+            nombres.push(nombre)
+       })
+       /*for(var i = 0; i < req.userObj.length; i++){
            nombres[i] = req.userObj[i].username
-       }
+       }*/
        res.status(200).send({usuarios:nombres})
     }
+}
+
+function updateUser(req, res){
+    // Si el usuario es un administrador , se actualiza la informacion
+    if(req.user.role == 'ROLE_ADMIN'){      
+        // Actualizar informacion, si hay un password, se hashea
+        if(req.body.password){
+                //Ciframos contraseña y guardamos
+                bcrypt.hash(req.body.password, null, null, function(err, hash){
+                    req.body.password = hash
+                    User.findByIdAndUpdate(req.userObj[0]._id, req.body).exec()
+                    .then((oldUser)=>{  
+                        User.findById(req.userObj[0]._id).exec()
+                        .then((updatedUser)=>{
+                            res.status(200).send({viejo:oldUser, nuevo:updatedUser})
+                        })
+                        .catch(function(err){
+                            res.status(409).send({message:"Conflicto", err:err})  
+                        });
+                    })
+                    .catch(function(err){
+                        res.status(409).send({message:"Conflicto", err:err})
+                    }); 
+                });
+            }else{
+                User.findByIdAndUpdate(req.userObj[0]._id, req.body).exec()
+                .then((oldUser)=>{
+                    User.findById(req.userObj[0]._id).exec()
+                    .then((updatedUser)=>{
+                        res.status(200).send({viejo:oldUser, nuevo:updatedUser})
+                    })
+                    .catch(function(err){
+                        res.status(409).send({message:"Conflicto", err:err})  
+                    });
+                })
+                .catch(function(err){
+                    res.status(409).send({message:"Conflicto", err:err})
+                });
+            } 
+        //res.status(200).send({Usuarios: req.userObj})        
+    } else {
+        //Se verifica si el usuario se esta actualizando a si mismo
+        if(req.user.sub == req.userObj[0]._id){
+            //Se puede actualizar la informacion
+            //Se revisa si se va a actualizar el password
+            if(req.body.password){
+                //Ciframos contraseña y guardamos
+                bcrypt.hash(req.body.password, null, null, function(err, hash){
+                    req.body.password = hash
+                    User.findByIdAndUpdate(req.userObj[0]._id, req.body).exec()
+                    .then((oldUser)=>{  
+                        User.findById(req.userObj[0]._id).exec()
+                        .then((updatedUser)=>{
+                            res.status(200).send({viejo:oldUser, nuevo:updatedUser})
+                        })
+                        .catch(function(err){
+                            res.status(409).send({message:"Conflicto", err:err})  
+                        });
+                    })
+                    .catch(function(err){
+                        res.status(409).send({message:"Conflicto", err:err})
+                    }); 
+                });
+            }else{
+                //Si no se actualiza el password, se no hay que cifrar.
+                User.findByIdAndUpdate(req.userObj[0]._id, req.body).exec()
+                .then((oldUser)=>{
+                    User.findById(req.userObj[0]._id).exec()
+                    .then((updatedUser)=>{
+                        res.status(200).send({viejo:oldUser, nuevo:updatedUser})
+                    })
+                    .catch(function(err){
+                        res.status(409).send({message:"Conflicto", err:err})  
+                    });
+                })
+                .catch(function(err){
+                    res.status(409).send({message:"Conflicto", err:err})
+                });
+            }      
+            //res.status(200).send({User: req.userObj[0]})
+        }else{
+            //No se puede mostrar la informacion de otros usuarios 
+            res.status(401).send({message:"No se puede actualizar la informacion de otros usuarios"})
+        }
+    }   
 }
 
 module.exports = {
@@ -144,5 +230,6 @@ module.exports = {
     loginUser,
     deleteUser,
     showUser,
-    showAll
+    showAll,
+    updateUser
 }

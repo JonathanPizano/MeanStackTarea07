@@ -32,6 +32,12 @@ api.get('/user/:userId?',
 api.get('/users',
                 md_auth.ensureAuth,
                 md_user.findAll,
-                UserController.showAll);                        
+                UserController.showAll);
+
+api.post('/user/update/:userId?',
+                md_auth.ensureAuth,
+                md_user.userIdParamsValidation,
+                md_user.findUserById,
+                UserController.updateUser);                
 
 module.exports = api;

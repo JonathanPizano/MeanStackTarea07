@@ -56,10 +56,10 @@ exports.findAll = function(req,res,next){
     User.find({}).exec()
     .then((usuarios)=>{
             req.userObj = usuarios
-            console.log(req.userObj)
+            //console.log(req.userObj)
             next()
     }).catch(function(err){
-        // Reminder: Revisar si realmente atrapa errores
+        // Reminder: Revisar si la notacion es correcta y si realmente atrapa errores
         res.status(500).send({message:"Error interno del servidor", err:err})
     })
 }
