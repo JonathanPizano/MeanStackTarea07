@@ -88,7 +88,7 @@ function deleteUser(req,res){
                     } else {
                         console.log(req.userObj[0]._id)
                         console.log(deletedUser)
-                        res.status(200).send({message: 'El administrador con el ID ' + req.userObj._id + ' no existe en BD'});
+                        res.status(200).send({message: 'El administrador con el ID ' + req.userObj[0]._id + ' no existe en BD'});
                     }
                 })                  
             } else {

@@ -34,7 +34,7 @@ api.get('/users',
                 md_user.findAll,
                 UserController.showAll);
 
-api.post('/user/update/:userId?',
+api.put('/user/update/:userId?',
                 md_auth.ensureAuth,
                 md_user.userIdParamsValidation,
                 md_user.findUserById,

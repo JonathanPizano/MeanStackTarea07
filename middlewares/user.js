@@ -45,6 +45,9 @@ exports.findUserById = function(req,res,next){
     //Buscamos usuario por _id
     User.find({_id:req.params.userId}).exec()
     .then((desired)=>{
+        if(!desired){
+            res.status(409).send({message:'No se encontró un producto con el iD'})
+        }
             req.userObj = desired
             next()
     })
@@ -55,9 +58,12 @@ exports.findAll = function(req,res,next){
     //Buscamos a todos los usuarios de la bd 
     User.find({}).exec()
     .then((usuarios)=>{
-            req.userObj = usuarios
-            //console.log(req.userObj)
+            if(!usuarios){
+                res.status(409).send({message:'No hay productos'})
+            }else{
+                req.userObj = usuarios
             next()
+            }
     }).catch(function(err){
         // Reminder: Revisar si la notacion es correcta y si realmente atrapa errores
         res.status(500).send({message:"Error interno del servidor", err:err})

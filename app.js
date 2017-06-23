@@ -5,6 +5,7 @@ var express = require('express');
 
 var app = express();
 var user_routes = require('./routes/user')
+var product_routes = require('./routes/product')
 
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(bodyParser.json());
@@ -21,5 +22,6 @@ app.use(function(req , res, next){
 });
 
 app.use('/myapp/crm/api', user_routes);
+app.use('/myapp/crm/api', product_routes);
 
 module.exports = app;
